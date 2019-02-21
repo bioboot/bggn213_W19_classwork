@@ -190,6 +190,10 @@ plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
 
 THis is some regular text but I can add data derived values in here like the number of atoms in this pdb `r nrow(s1$atom)`
 
+```{r eval=FALSE}
+# This is on purpose 
+mean(c("barry", "is", "Tird"))
+```
 
 
 

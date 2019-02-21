@@ -1,0 +1,111 @@
+---
+title: "Class11: Structural Bioinformatics 1"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The PDB database 
+
+Let's examine the PDB database composition
+
+```{r}
+stats <- read.csv("Data Export Summary.csv", row.names = 1)
+stats
+```
+
+Q1. Determine the percentage of structures solved by X-Ray and Electron Microscopy
+
+```{r}
+pre.by.method <- stats$Total/sum(stats$Total) * 100
+names(pre.by.method) <- rownames(stats)
+pre.by.method
+```
+
+Q. What proportion of structures are protein
+
+```{r}
+round( sum(stats$Proteins)/sum(stats$Total) * 100, 1)
+```
+
+
+```{r}
+tmp <- data.frame(stringsAsFactors=FALSE,
+   Experimental.Method = c("X-Ray", "Other", "NMR", "Multi Method",
+                           "Electron Microscopy", "Total"),
+              Proteins = c(124770L, 250L, 10988L, 127L, 2057L, 138192L),
+         Nucleic.Acids = c(1993L, 4L, 1273L, 5L, 31L, 3306L),
+    ProteinNA.Complex = c(6451L, 6L, 257L, 2L, 723L, 7439L),
+                 Other = c(10L, 13L, 8L, 1L, 0L, 32L),
+                 Total = c(133224L, 273L, 12526L, 135L, 2811L, 148969L)
+)
+
+```
+
+
+## Section 3. Bio3D
+
+```{r}
+library(bio3d)
+```
+
+```{r}
+pdb <- read.pdb("1hsg")
+pdb
+```
+
+
+
+```{r}
+library("bio3d.view")
+
+view(pdb, "overview", col="sse")
+```
+
+Extract the protein only portion of this PDB structure and write it out to a new PDB file.
+
+Extract the ligand (i.e. drug) and write out to a seperate file.
+
+```{r}
+inds <- atom.select(pdb, "ligand")
+inds
+```
+
+```{r}
+#inds$atom
+pdb$atom[inds$atom, ]
+```
+
+```{r}
+ligand.pdb <- trim.pdb(pdb, inds)
+ligand.pdb
+```
+
+```{r}
+view(ligand.pdb)
+```
+
+```{r}
+write.pdb(ligand.pdb, file="ligand.pdb")
+```
+
+
+
+```{r}
+pdb <- read.pdb("1HEL")
+
+# Normal Mode Analysis
+modes <- nma(pdb)
+plot(modes)
+
+```
+
+```{r}
+m7 <- mktrj(modes, mode=7, file="mode_7.pdb") 
+
+view(m7, col=vec2color( rmsf(m7) ))
+```
+
+
